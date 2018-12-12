@@ -1,3 +1,3 @@
 # ZohoInduction
 ## Queen Strikes Again
-Check how many squares can the queen strike
+Check how many squares the queen can strike
