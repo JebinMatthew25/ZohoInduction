@@ -13,6 +13,9 @@ public class HugePalindrome {
         for (int i=0; i<seq.length(); i++)
         {
             char k = seq.charAt(i);
+            if(!Character.isLetter(k))
+                continue;
+            k = Character.toLowerCase(k);
             if(count.containsKey(k))
                 count.put(k, count.get(k)+1);
             else
@@ -57,9 +60,7 @@ public class HugePalindrome {
 
         for (Character ch: count.keySet())
             for (int i =0; i< count.get(ch)/2; i++)
-                if(ch != ' ')
-                    left.append(ch);
-                else break;
+                left.append(ch);
 
         palindrome = left.toString() + middle + left.reverse();
     }
