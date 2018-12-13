@@ -16,10 +16,8 @@ public class HugePalindrome {
             if(!Character.isLetter(k))
                 continue;
             k = Character.toLowerCase(k);
-            if(count.containsKey(k))
-                count.put(k, count.get(k)+1);
-            else
-                count.put(k, 1);
+            count.putIfAbsent(k, 0);
+            count.put(k, count.get(k)+1);
         }
     }
 
