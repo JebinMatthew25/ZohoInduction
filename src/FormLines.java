@@ -2,11 +2,15 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
+
+class MyPair extends SimpleEntry<String, Integer> {
+    public MyPair(String key, Integer value) {
+        super(key, value);
+    }
+}
 
 class FormLines {
-    ArrayList<SimpleEntry<String, Integer>> words = new ArrayList<>();
+    private ArrayList<MyPair> words = new ArrayList<>();
     private Integer max_len;
 
     FormLines(Integer max_len, Character spl_ch, String[] arr)
@@ -20,25 +24,51 @@ class FormLines {
                 if(Character.toLowerCase(str.charAt(i)) != spl_ch)
                     val += 1;
             }
-            words.add(new SimpleEntry<>(str, val));
+            words.add(new MyPair(str, val));
         }
-        words.sort(Comparator.comparingInt(SimpleEntry::getValue));
+        words.sort(Comparator.comparingInt(MyPair::getValue));
         Collections.reverse(words);
 //        words = words.entrySet().stream().sorted(Map.Entry.comparingByValue())
 //                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
 //                        (e1, e2) -> e1, LinkedHashMap::new));
 
-        for (SimpleEntry<String, Integer> k: words)
+        for (MyPair k: words)
             System.out.printf("%s %d\n", k.getKey(), k.getValue());
     }
 
-    void process()
-    {
-        SimpleEntry temp;
+    void process() {
+        MyPair temp = null;
+        StringBuilder res = new StringBuilder();
 
-        while (!words.isEmpty())
-        {
-            temp  = words.remove(0);
+        while (!words.isEmpty()) {
+            temp = words.remove(0);
+            if (words.isEmpty())
+                break;
+            for (MyPair k : words) {
+                if (k.getValue() == max_len - temp.getValue()) {
+
+                    res.append(String.format("%s %s (%d)\n", temp.getKey(),
+                            k.getKey(), temp.getValue()+k.getValue()));
+                    temp = null;
+                    words.remove(k);
+                    break;
+                }
+            }
+            if (temp != null) {
+                for (MyPair k : words) {
+                    if (k.getValue() + temp.getValue() < max_len) {
+                        res.append(String.format("%s %s (%d)\n", temp.getKey(),
+                                k.getKey(), temp.getValue()+k.getValue()));
+                        temp = null;
+                        words.remove(k);
+                        break;
+                    }
+                }
+            }
         }
+        if (temp != null)
+            res.append(String.format("%s (%d)\n", temp.getKey(), temp.getValue());
+
+        System.out.println(res);
     }
 }

@@ -3,7 +3,6 @@ public class FormLinesDriver {
     {
         FormLines obj = new FormLines(10, 'o',
                 new String[]{"Zoho", "Eating", "Watching", "Pogo", "Loving", "Mango"});
-
         obj.process();
     }
 }
