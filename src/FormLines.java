@@ -3,7 +3,6 @@ import jebinmatt.util.MyStrInt;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 
 class FormLines {
@@ -20,9 +19,9 @@ class FormLines {
                 if (Character.toLowerCase(str.charAt(i)) != spl_ch)
                     val += 1;
             }
-            words.add(new jebinmatt.util.MyStrInt(str, val));
+            words.add(new MyStrInt(str, val));
         }
-        words.sort(Comparator.comparingInt(jebinmatt.util.MyStrInt::getValue));
+        words.sort(Comparator.comparingInt(MyStrInt::getValue));
         Collections.reverse(words);
 //        words = words.entrySet().stream().sorted(Map.Entry.comparingByValue())
 //                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
@@ -67,6 +66,8 @@ class FormLines {
                 best_max_len = 0;
                 for (int i = 0; i < words.size(); i++)
                     rec2(words.subList(i, i+1), words.invertedSubList(i, i+1));
+                best.sort(Comparator.comparingInt(MyStrInt::getValue));
+                Collections.reverse(best);
             }
             pack();
         }
