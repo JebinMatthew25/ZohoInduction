@@ -1,74 +1,87 @@
-import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
+import jebinmatt.util.MyList;
+import jebinmatt.util.MyStrInt;
+
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
-class MyPair extends SimpleEntry<String, Integer> {
-    public MyPair(String key, Integer value) {
-        super(key, value);
-    }
-}
 
 class FormLines {
-    private ArrayList<MyPair> words = new ArrayList<>();
-    private Integer max_len;
+    private MyList<MyStrInt> words = new MyList<>();
+    private MyList<MyStrInt> best = null;
+    private Integer max_len, best_max_len;
+    private StringBuilder res = new StringBuilder();
 
-    FormLines(Integer max_len, Character spl_ch, String[] arr)
-    {
+    FormLines(Integer max_len, Character spl_ch, String[] arr) {
         this.max_len = max_len;
-        for(String str: arr)
-        {
+        for (String str : arr) {
             int val = 0;
-            for (int i = 0; i < str.length(); i++)
-            {
-                if(Character.toLowerCase(str.charAt(i)) != spl_ch)
+            for (int i = 0; i < str.length(); i++) {
+                if (Character.toLowerCase(str.charAt(i)) != spl_ch)
                     val += 1;
             }
-            words.add(new MyPair(str, val));
+            words.add(new jebinmatt.util.MyStrInt(str, val));
         }
-        words.sort(Comparator.comparingInt(MyPair::getValue));
+        words.sort(Comparator.comparingInt(jebinmatt.util.MyStrInt::getValue));
         Collections.reverse(words);
 //        words = words.entrySet().stream().sorted(Map.Entry.comparingByValue())
 //                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
 //                        (e1, e2) -> e1, LinkedHashMap::new));
 
-        for (MyPair k: words)
-            System.out.printf("%s %d\n", k.getKey(), k.getValue());
+        System.out.println(words);
     }
 
-    void process() {
-        MyPair temp = null;
-        StringBuilder res = new StringBuilder();
+    private void rec(MyList<MyStrInt> left, MyList<MyStrInt> right)
+    {
+        if(best == null)
+        {
+            Integer sum = MyStrInt.sum(left);
+            if(sum.equals(max_len))
+                best = left;
 
-        while (!words.isEmpty()) {
-            temp = words.remove(0);
-            if (words.isEmpty())
-                break;
-            for (MyPair k : words) {
-                if (k.getValue() == max_len - temp.getValue()) {
-
-                    res.append(String.format("%s %s (%d)\n", temp.getKey(),
-                            k.getKey(), temp.getValue()+k.getValue()));
-                    temp = null;
-                    words.remove(k);
-                    break;
-                }
-            }
-            if (temp != null) {
-                for (MyPair k : words) {
-                    if (k.getValue() + temp.getValue() < max_len) {
-                        res.append(String.format("%s %s (%d)\n", temp.getKey(),
-                                k.getKey(), temp.getValue()+k.getValue()));
-                        temp = null;
-                        words.remove(k);
-                        break;
-                    }
-                }
-            }
+            for (int i = 0; i < right.size(); i++)
+                if(sum + right.get(i).getValue() <= max_len)
+                    rec(left.plus(right.subList(i, i+1)), right.invertedSubList(i, i+1));
         }
-        if (temp != null)
-            res.append(String.format("%s (%d)\n", temp.getKey(), temp.getValue());
+    }
 
+    private void rec2(MyList<MyStrInt> left, MyList<MyStrInt> right)
+    {
+        Integer sum = MyStrInt.sum(left);
+        if(sum > best_max_len)
+            best = left;
+
+        for (int i = 0; i < right.size(); i++)
+            if(sum + right.get(i).getValue() <= max_len)
+                rec2(left.plus(right.subList(i, i+1)), right.invertedSubList(i, i+1));
+    }
+
+    void process()
+    {
+        while (!words.isEmpty())
+        {
+            for (int i = 0; i < words.size(); i++)
+                rec(words.subList(i, i+1), words.invertedSubList(i, i+1));
+            if(best == null)
+            {
+                best_max_len = 0;
+                for (int i = 0; i < words.size(); i++)
+                    rec2(words.subList(i, i+1), words.invertedSubList(i, i+1));
+            }
+            pack();
+        }
         System.out.println(res);
+    }
+
+    private void pack()
+    {
+        Integer sum = MyStrInt.sum(best);
+        for (MyStrInt k : best) {
+            words.remove(k);
+            res.append(k.getKey());
+            res.append(' ');
+        }
+        res.append(String.format(" (%d)\n", sum));
+        best = null;
     }
 }

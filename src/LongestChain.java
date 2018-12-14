@@ -1,22 +1,30 @@
-import java.lang.reflect.Array;
-import java.util.Arrays;
+import jebinmatt.util.MyIntPair;
+import jebinmatt.util.MyList;
 
-public class LongestChain {
-    private Integer[][] pairs;
-    private Integer N;
+class LongestChain {
+    private MyList<MyIntPair> pairs = new MyList<>();
+    private MyList best = new MyList();
 
     LongestChain(Integer[][] pairs)
     {
-        this.pairs = pairs;
-        N = pairs.length;
+        for (Integer[] k : pairs)
+            this.pairs.add(new MyIntPair(k[0], k[1]));
     }
 
-    public void get_longest() {
-        Integer[] best = new Integer[N];
-        Arrays.fill(best, -1);
-        Integer max = 0;
+    private void rec(MyList<MyIntPair> left, MyList<MyIntPair> right)
+    {
+        if(left.size() > best.size())
+            best = left;
+        for (int i = 0; i < right.size(); i++)
+            if(left.get(left.size()-1).getValue() < right.get(i).getKey())
+                rec(left.plus(right.subList(i, i+1)), right.invertedSubList(i, i+1));
+    }
 
-
-
+    void get_longest() {
+        System.out.println(pairs);
+        for (int i = 0; i < pairs.size(); i++)
+            rec(pairs.subList(i, i+1), pairs.invertedSubList(i, i+1));
+        System.out.print("Best: ");
+        System.out.println(best);
     }
 }
